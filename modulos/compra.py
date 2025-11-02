@@ -13,6 +13,7 @@ def mostrar_compra():
             producto  = st.text_input("Producto")
             cantidad  = st.number_input("Cantidad", min_value=1, step=1, value=1)
             enviar = st.form_submit_button("✅ Guardar compra")
+
         if enviar:
             if not proveedor.strip() or not producto.strip():
                 st.warning("Proveedor y producto son obligatorios.")
@@ -29,7 +30,12 @@ def mostrar_compra():
                     con.rollback()
                     st.error(f"Error al registrar: {e}")
 
-        cur.execute("SELECT id, Proveedor, Producto, Cantidad FROM Compras ORDER BY id DESC")
+        # 👇 usa tu columna real y alias a 'id' si quieres
+        cur.execute("""
+            SELECT Id_compras AS id, Proveedor, Producto, Cantidad
+            FROM Compras
+            ORDER BY Id_compras DESC
+        """)
         rows = cur.fetchall()
         if rows:
             df = pd.DataFrame(rows, columns=[c[0] for c in cur.description])
