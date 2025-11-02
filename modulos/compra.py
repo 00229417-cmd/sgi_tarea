@@ -1,42 +1,51 @@
 import streamlit as st
 from modulos.config.conexion import obtener_conexion
+import pandas as pd
 
 def mostrar_compra():
-    st.header("📦 Registrar compra simple")
+    st.header("📦 Registrar compra")
 
     try:
         con = obtener_conexion()
-        cursor = con.cursor()
+        cur = con.cursor()
 
-        # Formulario para registrar la compra
         with st.form("form_compra"):
-            proveedor = st.text_input("Nombre del proveedor")
-            producto = st.text_input("Nombre del producto comprado")
-            cantidad = st.number_input("Cantidad comprada", min_value=1, step=1)
+            proveedor = st.text_input("Proveedor")
+            producto  = st.text_input("Producto comprado")
+            cantidad  = st.number_input("Cantidad", min_value=1, step=1, value=1)
             enviar = st.form_submit_button("✅ Guardar compra")
 
-            if enviar:
-                if proveedor.strip() == "" or producto.strip() == "":
-                    st.warning("⚠️ Debes ingresar el nombre del proveedor y del producto.")
-                else:
-                    try:
-                        cursor.execute(
-                            "INSERT INTO Compras (Proveedor, Producto, Cantidad) VALUES (%s, %s, %s)",
-                            (proveedor, producto, str(cantidad))
-                        )
-                        con.commit()
-                        st.success(f"✅ Compra registrada correctamente: {producto} (Cantidad: {cantidad}) de {proveedor}")
-                        st.rerun()
-                    except Exception as e:
-                        con.rollback()
-                        st.error(f"❌ Error al registrar la compra: {e}")
+        if enviar:
+            if not proveedor.strip() or not producto.strip():
+                st.warning("Proveedor y producto son obligatorios.")
+            else:
+                try:
+                    cur.execute(
+                        "INSERT INTO Compras (Proveedor, Producto, Cantidad) VALUES (%s, %s, %s)",
+                        (proveedor, producto, int(cantidad))
+                    )
+                    con.commit()
+                    st.success("Compra registrada.")
+                    st.rerun()
+                except Exception as e:
+                    con.rollback()
+                    st.error(f"Error al registrar: {e}")
+
+        # Historial
+        try:
+            cur.execute("SELECT id, Proveedor, Producto, Cantidad FROM Compras ORDER BY id DESC")
+            rows = cur.fetchall()
+            if rows:
+                df = pd.DataFrame(rows, columns=[c[0] for c in cur.description])
+                st.subheader("📜 Historial de compras")
+                st.dataframe(df, use_container_width=True)
+        except:
+            pass
 
     except Exception as e:
-        st.error(f"❌ Error general: {e}")
-
+        st.error(f"Error general: {e}")
     finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'con' in locals():
-            con.close()
+        try: cur.close(); con.close()
+        except: pass
+
 
