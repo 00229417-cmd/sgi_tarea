@@ -14,7 +14,6 @@ def verificar_usuario(Usuario, Contra):
     try:
         cursor = con.cursor()
         query = "SELECT Usuario, Contra FROM Empleados WHERE Usuario = %s AND Contra = %s"
-
         cursor.execute(query, (Usuario, Contra))
         result = cursor.fetchone()
         return result[0] if result else None
