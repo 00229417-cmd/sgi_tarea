@@ -11,6 +11,6 @@ def obtener_conexion():
         database=cfg["database"],
         port=int(cfg.get("port", 3306)),
         autocommit=True,
-        connection_timeout=6
+        connection_timeout=6,
+        ssl_disabled=False   # intenta canal cifrado
     )
-
