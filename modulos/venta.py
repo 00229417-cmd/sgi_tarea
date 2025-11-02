@@ -12,6 +12,7 @@ def mostrar_venta():
             producto = st.text_input("Producto")
             cantidad = st.number_input("Cantidad", min_value=1, step=1, value=1)
             enviar = st.form_submit_button("✅ Guardar venta")
+
         if enviar:
             if not producto.strip():
                 st.warning("Ingresa el nombre del producto.")
@@ -28,7 +29,12 @@ def mostrar_venta():
                     con.rollback()
                     st.error(f"Error al registrar: {e}")
 
-        cur.execute("SELECT id, Producto, Cantidad FROM Ventas ORDER BY id DESC")
+        # 👇 usa tu columna real y, si quieres, aliaséala a 'id'
+        cur.execute("""
+            SELECT Id_venta AS id, Producto, Cantidad
+            FROM Ventas
+            ORDER BY Id_venta DESC
+        """)
         rows = cur.fetchall()
         if rows:
             df = pd.DataFrame(rows, columns=[c[0] for c in cur.description])
@@ -40,4 +46,3 @@ def mostrar_venta():
     finally:
         try: cur.close(); con.close()
         except: pass
-
