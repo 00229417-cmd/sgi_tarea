@@ -29,7 +29,7 @@ def login():
         st.success("✅ Conexión a la base de datos establecida correctamente.")
 
     Usuario = st.text_input("Usuario", key="Usuario_input")
-    Contra = st.text_input("Contraseña", type="password", key="Contra_input")
+    Contra = st.text_input("Contra", type="password", key="Contra_input")
 
     if st.button("Iniciar sesión"):
         tipo = verificar_usuario(Usuario, Contra)
