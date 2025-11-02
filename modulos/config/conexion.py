@@ -1,3 +1,4 @@
+# modulos/config/conexion.py
 import streamlit as st
 import mysql.connector
 
@@ -12,3 +13,4 @@ def obtener_conexion():
         autocommit=True,
         connection_timeout=6
     )
+
