@@ -1,9 +1,8 @@
-# modulos/config/conexion.py
 import streamlit as st
 import mysql.connector
 
 def obtener_conexion():
-    cfg = st.secrets["db"]  # lee tus datos desde Secrets
+    cfg = st.secrets["db"]
     return mysql.connector.connect(
         host=cfg["host"],
         user=cfg["user"],
