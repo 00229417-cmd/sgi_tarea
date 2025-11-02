@@ -44,4 +44,14 @@ elif opcion == "Clientes":
 else:
     st.title("⚙️ Otras funciones")
     st.info("Aquí puedes agregar reportes u otras secciones.")
+    from modulos.config.conexion import obtener_conexion
+import streamlit as st
+
+try:
+    con = obtener_conexion()
+    st.success("✅ Conectado correctamente a Clever Cloud MySQL")
+    con.close()
+except Exception as e:
+    st.error(f"❌ Error de conexión: {e}")
+
 
