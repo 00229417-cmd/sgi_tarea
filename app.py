@@ -1,51 +1,20 @@
 # app.py
 import streamlit as st
+from modulos.venta import mostrar_venta  # Importamos la función mostrar_venta del módulo venta
 from modulos.login import login
-from modulos.venta import mostrar_venta
-from modulos.compra import mostrar_compra
-from modulos.clientes import mostrar_clientes  # 👈 Nuevo módulo
 
-# Configuración general de la página
-st.set_page_config(page_title="SGI - Sistema de Gestión", layout="wide")
+# Comprobamos si la sesión ya está iniciada
+if "sesion_iniciada" in st.session_state and st.session_state["sesion_iniciada"]:
+    # Mostrar el menú lateral
+    opciones = ["Ventas", "Otra opción"]  # Agrega más opciones si las necesitas
+    seleccion = st.sidebar.selectbox("Selecciona una opción", opciones)
 
-# --- CONTROL DE SESIÓN ---
-# Si no existe la variable en la sesión, se crea con valores por defecto
-st.session_state.setdefault("session_iniciada", False)
-st.session_state.setdefault("usuario", None)
-
-# --- CUERPO PRINCIPAL ---
-if st.session_state["session_iniciada"]:
-    # --- MENÚ LATERAL ---
-    with st.sidebar:
-        st.header("Menú principal 📋")
-        seleccion = st.selectbox(
-            "Selecciona una opción",
-            ["Ventas", "Compras", "Clientes", "Otra opción"]
-        )
-        st.divider()
-        st.caption(f"Conectado como: {st.session_state['usuario']}")
-
-        # Botón para cerrar sesión
-        if st.button("Cerrar sesión 🔒", use_container_width=True):
-            st.session_state["session_iniciada"] = False
-            st.session_state["usuario"] = None
-            st.success("Sesión cerrada correctamente.")
-            st.rerun()
-
-    # --- CONTENIDO SEGÚN LA OPCIÓN SELECCIONADA ---
+    # Según la opción seleccionada, mostramos el contenido correspondiente
     if seleccion == "Ventas":
         mostrar_venta()
-
-    elif seleccion == "Compras":
-        mostrar_compra()
-
-    elif seleccion == "Clientes":
-        mostrar_clientes()
-
     elif seleccion == "Otra opción":
-        st.title("⚙️ Otras funciones")
-        st.info("Aquí puedes agregar más secciones o reportes del sistema.")
+        st.write("Has seleccionado otra opción.")  # Aquí podrías agregar el contenido de otras opciones
 
 else:
-    # --- PANTALLA DE LOGIN ---
+    # Si la sesión no está iniciada, mostrar el login
     login()
