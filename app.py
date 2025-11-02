@@ -1,20 +1,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="SGI - Sistema", layout="wide")
-from modulos.config.conexion import obtener_conexion
-import streamlit as st
 
-with st.expander("🧪 Probar conexión a MySQL", expanded=False):
-    if st.button("Probar conexión"):
-        with st.spinner("Intentando conectar..."):
-            try:
-                con = obtener_conexion()
-                cur = con.cursor()
-                cur.execute("SELECT NOW()")
-                st.success(f"✅ Conectado. Hora del servidor: {cur.fetchone()[0]}")
-                cur.close(); con.close()
-            except Exception as e:
-                st.error(f"❌ No se pudo conectar: {e}")
 
 st.session_state.setdefault("session_iniciada", False)
 st.session_state.setdefault("usuario", None)
