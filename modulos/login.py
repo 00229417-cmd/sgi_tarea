@@ -1,43 +1,38 @@
 import streamlit as st
 from modulos.config.conexion import obtener_conexion
-from modulos.venta          import mostrar_venta
-
-def verificar_usuario(Usuario, contra):
-    con = obtener_conexion()
-    if not con:
-        st.error("⚠️ No se pudo conectar a la base de datos.")
-        return None
-    else:
-        # ✅ Guardar en el estado que la conexión fue exitosa
-        st.session_state["conexion_exitosa"] = True
-
-    try:
-        cursor = con.cursor()
-        query = "SELECT Usuario, Contra FROM Empleados WHERE Usuario = %s AND Contra = %s"
-        cursor.execute(query, (Usuario, contra))
-        result = cursor.fetchone()
-        return result[0] if result else None
-    finally:
-        con.close()
-
 
 def login():
-    st.title("Inicio de sesión")
+    st.title("Iniciar sesión")
 
-    # 🟢 Mostrar mensaje persistente si ya hubo conexión exitosa
-    if st.session_state.get("conexion_exitosa"):
-        st.success("✅ Conexión a la base de datos establecida correctamente.")
+    usuario = st.text_input("Usuario")
+    clave   = st.text_input("Contraseña", type="password")
 
-    Usuario = st.text_input("Usuario", key="Usuario_input")
-    contra = st.text_input("Contraseña", type="password", key="Contra_input")
+    if st.button("Entrar", use_container_width=True):
+        try:
+            con = obtener_conexion()
+            cur = con.cursor()
 
-    if st.button("Iniciar sesión"):
-        tipo = verificar_usuario(Usuario, contra)
-        if tipo:
-            st.session_state["usuario"] = Usuario
-            st.session_state["tipo_usuario"] = tipo
-            st.success(f"Bienvenido ({Usuario}) 👋")
-            st.session_state["sesion_iniciada"] = True
-            st.rerun()
-        else:
-            st.error("❌ Credenciales incorrectas.")
+            # Usa tu tabla real:
+            # Opción A (como en tu BD): Empleados(usuario, clave)
+            cur.execute(
+                "SELECT 1 FROM Empleados WHERE usuario=%s AND clave=%s LIMIT 1",
+                (usuario, clave)
+            )
+
+            # Opción B (si usas USUARIO con SHA2) — reemplaza la consulta de arriba:
+            # cur.execute("SELECT 1 FROM USUARIO WHERE usuario=%s AND clave_hash=SHA2(%s,256) LIMIT 1",
+            #             (usuario, clave))
+
+            ok = cur.fetchone() is not None
+            cur.close(); con.close()
+
+            if ok:
+                st.session_state["session_iniciada"] = True
+                st.session_state["usuario"] = usuario
+                st.success("¡Bienvenido!")
+                st.rerun()
+            else:
+                st.error("Usuario o contraseña incorrectos")
+        except Exception as e:
+            st.error(f"Error de conexión/consulta: {e}")
+
